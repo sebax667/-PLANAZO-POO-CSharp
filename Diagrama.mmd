@@ -1,0 +1,86 @@
+classDiagram
+    direction LR
+
+    class Program {
+        <<static>>
+        +Main() void
+    }
+
+    class GestorReservas {
+        -List~Evento~ _eventos
+        -List~Usuario~ _usuarios
+        -List~Reserva~ _reservas
+        +RegistrarEvento(Evento) void
+        +RegistrarUsuario(string, string) Usuario
+        +CrearReserva(int, int, int) Reserva
+        +CancelarReserva(int) Reserva
+        +ObtenerReservasActivas() IEnumerable~Reserva~
+        +TotalReservasActivas int
+        +TotalEntradasActivas int
+        +ValorTotalActivo decimal
+    }
+
+    class Evento {
+        <<abstract>>
+        +int Id
+        +string Nombre
+        +DateTime Fecha
+        +string Lugar
+        +decimal PrecioBase
+        +int CupoTotal
+        +int CupoDisponible
+        +string Tipo
+        +CalcularPrecioFinal()* decimal
+        +HayCupoPara(int) bool
+    }
+
+    class Cine {
+        +string Formato
+        +CalcularPrecioFinal() decimal
+    }
+    class Concierto {
+        +string Artista
+        +CalcularPrecioFinal() decimal
+    }
+    class Taller {
+        +string Instructor
+        +CalcularPrecioFinal() decimal
+    }
+    class EventoDeportivo {
+        +string Deporte
+        +bool EsFinal
+        +CalcularPrecioFinal() decimal
+    }
+
+    class Usuario {
+        +int Id
+        +string Nombre
+        +string Correo
+        +IReadOnlyList~Reserva~ Reservas
+    }
+
+    class Reserva {
+        +int Id
+        +int Cantidad
+        +decimal PrecioUnitario
+        +decimal Total
+        +bool Activa
+        +DateTime FechaCreacion
+    }
+
+    class ReservaException {
+        <<exception>>
+    }
+
+    Evento <|-- Cine
+    Evento <|-- Concierto
+    Evento <|-- Taller
+    Evento <|-- EventoDeportivo
+    Usuario "1" o-- "0..*" Reserva : realiza
+    Reserva "0..*" --> "1" Evento : corresponde a
+    GestorReservas o-- Evento : administra
+    GestorReservas o-- Usuario : administra
+    GestorReservas o-- Reserva : administra
+    Program ..> GestorReservas : utiliza
+    GestorReservas ..> ReservaException : informa errores
+    ReservaException --|> Exception
